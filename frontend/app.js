@@ -59,7 +59,7 @@ async function apiFetch(path, options = {}, requiresAuth = false) {
     let details = response.statusText;
     try {
       const body = await response.json();
-      details = body.detail || JSON.stringify(body);
+      details = body.error?.message || body.detail || JSON.stringify(body);
     } catch {
       // keep status text when no json body
     }
@@ -87,7 +87,7 @@ async function registerUser(event) {
   event.preventDefault();
   const formData = new FormData(event.target);
   const payload = {
-    username: formData.get("username"),
+    email: formData.get("username"),
     password: formData.get("password")
   };
 
@@ -107,7 +107,7 @@ async function loginUser(event) {
   event.preventDefault();
   const formData = new FormData(event.target);
   const payload = {
-    username: formData.get("username"),
+    email: formData.get("username"),
     password: formData.get("password")
   };
 
@@ -134,7 +134,10 @@ async function loginUser(event) {
 async function createTask(event) {
   event.preventDefault();
   const formData = new FormData(event.target);
-  const payload = { title: formData.get("title") };
+  const payload = {
+    title: formData.get("title"),
+    description: formData.get("title")
+  };
 
   try {
     await apiFetch("/tasks", {
@@ -159,7 +162,10 @@ function taskCompleted(task) {
 
 async function completeTask(id) {
   try {
-    await apiFetch(`/tasks/${id}/complete`, { method: "PATCH" }, true);
+    await apiFetch(`/tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ completed: true })
+    }, true);
     setStatus(refs.listTaskMessage, "Task marked complete.", "success");
     await listTasks();
   } catch (error) {

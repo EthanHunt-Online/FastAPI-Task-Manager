@@ -1,20 +1,26 @@
-# FastAPI-Task-Manager
+# FastAPI Task Manager
 
-A full-stack task manager application with a FastAPI backend and a lightweight static frontend. It supports user registration/login with JWT authentication and task CRUD operations scoped to the authenticated user.
+A full-stack task manager app with:
+- a **FastAPI + SQLAlchemy backend** (`backend/`)
+- a **static HTML/CSS/JS frontend** (`frontend/`)
 
-## Project Overview
+It supports registration/login with JWT authentication and per-user task CRUD.
 
-This repository contains:
-- **Backend API** built with FastAPI + SQLAlchemy for authentication and task management.
-- **Frontend client** (vanilla HTML/CSS/JS) that calls the backend API.
-- **Basic tests** for configuration behavior.
+## Current Project Status
 
-Core backend capabilities include:
-- User registration and login.
-- JWT bearer token issuance and verification.
-- Task create/read/update/delete endpoints.
-- Per-user authorization checks (users can only access their own tasks).
-- Pagination and completion-status filtering on task listing.
+### ✅ Implemented
+- User registration (`POST /register`) and login (`POST /login`).
+- JWT-based auth (`Authorization: Bearer <token>`).
+- Task create/list/get/update/delete endpoints under `/tasks`.
+- Per-user task ownership checks.
+- Pagination (`skip`, `limit`) and completion filtering (`completed`) on task listing.
+- API tests in `backend/tests/`.
+
+### ⚠️ Notes
+- There are **two app folders**: root `app/` and `backend/app/`.
+  - The functional task-manager API lives in `backend/app/`.
+  - Root `app/` currently only exposes a simple `/health` endpoint and is not used by backend tests.
+- Test/dependency installation may fail in restricted environments without package index access.
 
 ## Folder Structure
 
@@ -22,40 +28,82 @@ Core backend capabilities include:
 .
 ├── backend/
 │   ├── app/
-│   │   ├── api/         # Route handlers (auth + tasks)
-│   │   ├── core/        # Settings and security helpers
-│   │   ├── db/          # Database session/engine wiring
-│   │   ├── models/      # SQLAlchemy models
-│   │   ├── schemas/     # Pydantic request/response models
-│   │   └── main.py      # FastAPI app entrypoint
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── db/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   └── main.py
+│   ├── tests/
 │   └── requirements.txt
 ├── frontend/
 │   ├── app.js
 │   ├── config.template.js
 │   ├── config.js
 │   ├── index.html
-│   ├── serve.sh         # Static frontend server helper script
+│   ├── serve.sh
 │   └── styles.css
+├── app/
 ├── tests/
+├── requirements.txt
 └── README.md
 ```
 
-## Local Setup Instructions
+## Local Setup
 
-### 1) Backend setup
+### 1) Backend
 
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Open API docs at: `http://127.0.0.1:8000/docs`
+Docs: `http://127.0.0.1:8000/docs`
 
-## Run tests
+### 2) Frontend
 
+```bash
+cd frontend
+cp config.template.js config.js
+# edit config.js and set API_BASE_URL to your backend URL if needed
+./serve.sh
+```
+
+Then open: `http://127.0.0.1:3000`
+
+## Running Tests
+
+Backend API tests:
 ```bash
 cd backend
 pytest
+```
+
+Root config tests:
+```bash
+cd /path/to/FastAPI-Task-Manager
+pytest tests/test_config.py
+```
+
+## Quick API Smoke Flow
+
+```bash
+# register
+curl -X POST http://127.0.0.1:8000/register \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"alice@example.com","password":"password123"}'
+
+# login
+TOKEN=$(curl -s -X POST http://127.0.0.1:8000/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"alice@example.com","password":"password123"}' | jq -r .access_token)
+
+# create task
+curl -X POST http://127.0.0.1:8000/tasks \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"My task","description":"demo"}'
 ```
