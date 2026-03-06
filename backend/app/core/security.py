@@ -4,7 +4,7 @@ import bcrypt
 import jwt
 from fastapi import HTTPException, status
 
-from app.core.config import settings
+from backend.app.core.config import settings
 
 
 def hash_password(password: str) -> str:
