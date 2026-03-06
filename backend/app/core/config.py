@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "FastAPI Task Manager"
-    database_url: str = "sqlite:///./task_manager.db"
+    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/task_manager"
     jwt_secret_key: str = Field(default="change-this-in-production")
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60

@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 # Ensure app settings load a dedicated SQLite database for tests.
 os.environ["DATABASE_URL"] = "sqlite:///./test_task_manager.db"
 
-from app.db.session import engine
-from app.main import app
-from app.models import Base
+from backend.app.db.session import engine
+from backend.app.main import app
+from backend.app.models import Base
 
 
 @pytest.fixture(autouse=True)

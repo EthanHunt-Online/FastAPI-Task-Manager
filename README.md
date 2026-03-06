@@ -16,11 +16,10 @@ It supports registration/login with JWT authentication and per-user task CRUD.
 - Pagination (`skip`, `limit`) and completion filtering (`completed`) on task listing.
 - API tests in `backend/tests/`.
 
-### ⚠️ Notes
-- There are **two app folders**: root `app/` and `backend/app/`.
-  - The functional task-manager API lives in `backend/app/`.
-  - Root `app/` currently only exposes a simple `/health` endpoint and is not used by backend tests.
-- Test/dependency installation may fail in restricted environments without package index access.
+### ✅ Project Structure Cleanup
+- Backend application code is now the single source of truth in `backend/app/`.
+- Root `app/` is a compatibility shim that re-exports `backend.app` to avoid import conflicts.
+- Database default has been migrated to PostgreSQL.
 
 ## Folder Structure
 
@@ -43,7 +42,7 @@ It supports registration/login with JWT authentication and per-user task CRUD.
 │   ├── index.html
 │   ├── serve.sh
 │   └── styles.css
-├── app/
+├── app/  # compatibility re-export layer
 ├── tests/
 ├── requirements.txt
 └── README.md
@@ -58,7 +57,11 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Example PostgreSQL DSN (override as needed)
+export DATABASE_URL="postgresql+psycopg://postgres:postgres@localhost:5432/task_manager"
+
+uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Docs: `http://127.0.0.1:8000/docs`
@@ -78,8 +81,8 @@ Then open: `http://127.0.0.1:3000`
 
 Backend API tests:
 ```bash
-cd backend
-pytest
+cd /path/to/FastAPI-Task-Manager
+pytest backend/tests
 ```
 
 Root config tests:
