@@ -1,6 +1,6 @@
-from backend.app.schemas.task import TaskCreate, TaskResponse, TaskUpdate
-from backend.app.schemas.token import TokenResponse
-from backend.app.schemas.user import UserRegister, UserResponse
+from .task import TaskCreate, TaskResponse, TaskUpdate
+from .token import TokenResponse
+from .user import UserRegister, UserResponse
 
 __all__ = [
     "TaskCreate",

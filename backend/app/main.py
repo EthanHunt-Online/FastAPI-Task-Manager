@@ -3,11 +3,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from backend.app.api.auth import router as auth_router
-from backend.app.api.tasks import router as tasks_router
-from backend.app.core.config import settings
-from backend.app.db.session import engine
-from backend.app.models import Base
+from .api.auth import router as auth_router
+from .api.tasks import router as tasks_router
+from .core.config import settings
+from .db.session import engine
+from .models import Base
 
 app = FastAPI(title=settings.app_name)
 
